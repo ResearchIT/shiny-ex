@@ -1,4 +1,4 @@
-ilibrary(shiny)
+library(shiny)
 library(datasets)
 
 # Data pre-processing ----

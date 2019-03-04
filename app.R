@@ -1,29 +1,4 @@
-
-Skip to content
-
-    Pull requests
-    Issues
-    Marketplace
-    Explore
-
-    @baberlevi
-
-335
-3,285
-
-    1,468
-
-rstudio/shiny
-Code
-Issues 440
-Pull requests 18
-Projects 0
-Wiki
-Insights
-shiny/inst/examples/04_mpg/app.R
-@mine-cetinkaya-rundel mine-cetinkaya-rundel Convert examples to single file apps (#1685) d7391b1 on Jul 11, 2017
-76 lines (56 sloc) 1.92 KB
-library(shiny)
+ilibrary(shiny)
 library(datasets)
 
 # Data pre-processing ----
@@ -98,19 +73,4 @@ server <- function(input, output) {
 
 # Create Shiny app ----
 shinyApp(ui, server)
-
-    © 2019 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Help
-
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-
 

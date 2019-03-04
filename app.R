@@ -1,10 +1,44 @@
-library(shiny)
 
-# Define UI for data upload app ----
+Skip to content
+
+    Pull requests
+    Issues
+    Marketplace
+    Explore
+
+    @baberlevi
+
+335
+3,285
+
+    1,468
+
+rstudio/shiny
+Code
+Issues 440
+Pull requests 18
+Projects 0
+Wiki
+Insights
+shiny/inst/examples/04_mpg/app.R
+@mine-cetinkaya-rundel mine-cetinkaya-rundel Convert examples to single file apps (#1685) d7391b1 on Jul 11, 2017
+76 lines (56 sloc) 1.92 KB
+library(shiny)
+library(datasets)
+
+# Data pre-processing ----
+# Tweak the "am" variable to have nicer factor labels -- since this
+# doesn't rely on any user inputs, we can do this once at startup
+# and then use the value throughout the lifetime of the app
+mpgData <- mtcars
+mpgData$am <- factor(mpgData$am, labels = c("Automatic", "Manual"))
+
+
+# Define UI for miles per gallon app ----
 ui <- fluidPage(
 
   # App title ----
-  titlePanel("Uploading Files"),
+  titlePanel("Miles Per Gallon"),
 
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -12,82 +46,71 @@ ui <- fluidPage(
     # Sidebar panel for inputs ----
     sidebarPanel(
 
-      # Input: Select a file ----
-      fileInput("file1", "Choose CSV File",
-                multiple = TRUE,
-                accept = c("text/csv",
-                         "text/comma-separated-values,text/plain",
-                         ".csv")),
+      # Input: Selector for variable to plot against mpg ----
+      selectInput("variable", "Variable:",
+                  c("Cylinders" = "cyl",
+                    "Transmission" = "am",
+                    "Gears" = "gear")),
 
-      # Horizontal line ----
-      tags$hr(),
-
-      # Input: Checkbox if file has header ----
-      checkboxInput("header", "Header", TRUE),
-
-      # Input: Select separator ----
-      radioButtons("sep", "Separator",
-                   choices = c(Comma = ",",
-                               Semicolon = ";",
-                               Tab = "\t"),
-                   selected = ","),
-
-      # Input: Select quotes ----
-      radioButtons("quote", "Quote",
-                   choices = c(None = "",
-                               "Double Quote" = '"',
-                               "Single Quote" = "'"),
-                   selected = '"'),
-
-      # Horizontal line ----
-      tags$hr(),
-
-      # Input: Select number of rows to display ----
-      radioButtons("disp", "Display",
-                   choices = c(Head = "head",
-                               All = "all"),
-                   selected = "head")
+      # Input: Checkbox for whether outliers should be included ----
+      checkboxInput("outliers", "Show outliers", TRUE)
 
     ),
 
     # Main panel for displaying outputs ----
     mainPanel(
 
-      # Output: Data file ----
-      tableOutput("contents")
+      # Output: Formatted text for caption ----
+      h3(textOutput("caption")),
+
+      # Output: Plot of the requested variable against mpg ----
+      plotOutput("mpgPlot")
 
     )
-
   )
 )
 
-# Define server logic to read selected file ----
+# Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
 
-  output$contents <- renderTable({
+  # Compute the formula text ----
+  # This is in a reactive expression since it is shared by the
+  # output$caption and output$mpgPlot functions
+  formulaText <- reactive({
+    paste("mpg ~", input$variable)
+  })
 
-    # input$file1 will be NULL initially. After the user selects
-    # and uploads a file, head of that data file by default,
-    # or all rows if selected, will be shown.
+  # Return the formula text for printing as a caption ----
+  output$caption <- renderText({
+    formulaText()
+  })
 
-    req(input$file1)
-
-    df <- read.csv(input$file1$datapath,
-             header = input$header,
-             sep = input$sep,
-             quote = input$quote)
-
-    if(input$disp == "head") {
-      return(head(df))
-    }
-    else {
-      return(df)
-    }
-
+  # Generate a plot of the requested variable against mpg ----
+  # and only exclude outliers if requested
+  output$mpgPlot <- renderPlot({
+    boxplot(as.formula(formulaText()),
+            data = mpgData,
+            outline = input$outliers,
+            col = "#75AADB", pch = 19)
   })
 
 }
 
 # Create Shiny app ----
 shinyApp(ui, server)
+
+    © 2019 GitHub, Inc.
+    Terms
+    Privacy
+    Security
+    Status
+    Help
+
+    Contact GitHub
+    Pricing
+    API
+    Training
+    Blog
+    About
+
 
